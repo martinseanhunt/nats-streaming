@@ -3,10 +3,14 @@ import { randomBytes } from 'crypto'
 
 console.clear()
 
-const stan = nats.connect('nats-ticketing', randomBytes(4).toString('hex'), {
-  // Communicating with nats running on k8 using simple port forwarding
-  url: 'http://localhost:4222',
-})
+const stan = nats.connect(
+  'nats-ticketing',
+  `pub-${randomBytes(4).toString('hex')}`,
+  {
+    // Communicating with nats running on k8 using simple port forwarding
+    url: 'http://localhost:4222',
+  }
+)
 
 stan.on('connect', () => {
   console.log('publisher connected to nats')
