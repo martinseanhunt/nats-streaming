@@ -23,7 +23,7 @@ stan.on('connect', () => {
   })
 
   // item created is our channel which can be listened to to recieve events
-  stan.publish('item:created', data, () => {
+  stan.publish('ticket:created', data, () => {
     console.log('event published')
   })
 })
