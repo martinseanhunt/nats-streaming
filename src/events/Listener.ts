@@ -1,14 +1,27 @@
 import { Message, Stan } from 'node-nats-streaming'
+import { Subjects } from './Subjects'
+
+// Create a generic event interface which will serve as the base type for individual events
+interface Event {
+  subject: Subjects
+  data: any
+}
 
 // Abstract class (meaning instances of it can't be created directly. This class must be extended to be used)
-export abstract class Listener {
+// <T extends Event> means that when we extend the class we also have to pass an interface that extends the Event type
+// which we'll use to provied all the properties that a given event can have.
+// Now we can refer to the generic type T in this class which will refer to whatever is being passed in
+export abstract class Listener<T extends Event> {
   // These abstract properties must be set by the extending class
   // subject is the channel / topic (so many interchangable terms!)
-  abstract subject: string
+  // the subject provided when extending the classs should match
+  // the specific subject we're listening for.
+  abstract subject: T['subject']
   abstract queueGroupName: string
 
   // The function that will be called to process the incoming message
-  abstract onMessage(parsedData: any, msg: Message): void
+  // T['data'] means the data should be of type data from the specific lister class that extends this one
+  abstract onMessage(parsedData: T['data'], msg: Message): void
 
   // must be defined here and only here
   private client: Stan

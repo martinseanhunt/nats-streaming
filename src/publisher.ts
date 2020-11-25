@@ -1,6 +1,8 @@
 import nats from 'node-nats-streaming'
 import { randomBytes } from 'crypto'
 
+import { TicketCreatedPublisher } from './events/TicketCreatedPublisher'
+
 console.clear()
 
 const stan = nats.connect(
@@ -12,18 +14,18 @@ const stan = nats.connect(
   }
 )
 
-stan.on('connect', () => {
+stan.on('connect', async () => {
   console.log('publisher connected to nats')
 
+  const publisher = new TicketCreatedPublisher(stan)
+
   // Messages neeed to be strings
-  const data = JSON.stringify({
+  const data = {
     id: '1234',
     title: 'sas new test',
     price: 25,
-  })
+  }
 
-  // item created is our channel which can be listened to to recieve events
-  stan.publish('ticket:created', data, () => {
-    console.log('event published')
-  })
+  const publishResult = await publisher.publish(data)
+  console.log(publishResult)
 })
